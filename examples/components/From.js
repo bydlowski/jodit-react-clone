@@ -1,81 +1,71 @@
-import React, {useState} from 'react';
+import React, {Component} from 'react';
 
 import JoditEditor from "../../src/";
 
-const From = () => {
-	const [config, setConfig] = useState({
-		readonly: false,
-		toolbar: true,
-	})
+export default class From extends Component {
+    state = {
+        config: {
+            readonly: false,
+            toolbar: true,
+        },
+        value: 'Test',
+        spin: 1
+    };
 
-	const [textAreaValue, setTextAreaValue] = useState('Test')
+    toggleToolbar = () => {
+        this.setState(prevState => {
+            let config = {
+                readonly: prevState.config.readonly,
+                toolbar: !prevState.config.toolbar
+            };
 
-	const [inputValue, setInputValue] = useState('')
+            return {
+                config: config,
+                value: prevState.value
+            }
+        });
+    };
 
-	const [spin, setSpin] = useState(1)
+    toggleReadOnly = () => {
+        this.setState(prevState => {
+            let config = {
+                toolbar: prevState.config.toolbar,
+                readonly: !prevState.config.readonly
+            };
 
-	const toggleToolbar = () => (
-		setConfig(config => ({
-			...config,
-			toolbar: !config.toolbar,
-		}))
-	)
+            return {
+                config: config,
+                value: prevState.value
+            }
+        });
+    };
 
-	const toggleReadOnly = () => (
-		setConfig(config => ({
-			...config,
-			readonly: !config.readonly,
-		}))
-	)
+    onChangeInput = () => {
+        this.setState(prevState => ({
+            config: prevState.config,
+            value: this.refs.input.value
+        }));
+    };
 
-	const handleBlurAreaChange = () => {
-		console.log('Blur')
-	};
+    spin = () => {
+        this.setState(prevState => ({
+            config: prevState.config,
+            value: prevState.value,
+            spin: prevState.spin + 1
+        }));
+    };
 
-	const handleTextAreaChange = newTextAreaValue => {
-		console.log('handleTextAreaChange', newTextAreaValue)
-		return (
-			setTextAreaValue(() => newTextAreaValue)
-		)
-	}
-
-	const handleInputChange = e => {
-		const {value} = e.target
-		setInputValue(() => value)
-		handleTextAreaChange(value)
-	}
-
-	const handleSpin = () => setSpin(spin => ++spin)
-
-	return (
-		<div>
-			<JoditEditor
-				config={config}
-				onChange={handleTextAreaChange}
-				onBlur={handleBlurAreaChange}
-				value={textAreaValue}/>
-			<input
-				onChange={handleInputChange}
-				placeholder={"enter some text"}
-				type={"text"}
-				value={inputValue}/>
-			<button
-				onClick={toggleReadOnly}
-				type={"button"}>
-				{'Toggle Read-Only'}
-			</button>
-			<button
-				onClick={toggleToolbar}
-				type={"button"}>
-				{'Toggle Toolbar'}
-			</button>
-			<button
-				type={"button"}
-				onClick={handleSpin}>
-				{`Spin ${spin}`}
-			</button>
-		</div>
-	)
+    render () {
+        return <div>
+            <JoditEditor
+                value={this.state.value}
+                config={this.state.config}
+                onChange={console.log}
+            />
+            <input placeholder={"entre some text"} ref="input" type="text" onChange={this.onChangeInput}/>
+            <button type="button" onClick={this.toggleReadOnly}>Toggle Read-Only</button>
+            <button type="button" onClick={this.toggleToolbar}>Toggle Toolbar</button>
+            <button type="button" onClick={this.spin}>Spin {this.state.spin}</button>
+        </div>
+    };
 }
-
-export default From
